@@ -62,9 +62,9 @@ models = {
 }
 
 # Entrenar modelos
-models["unidades_por_categoria"].fit(X_cat_train, y_uni_train, epochs=50, batch_size=32, validation_data=(X_cat_test, y_uni_test), verbose=1)
-models["importe_por_canal"].fit(X_can_train, y_imp_can_train, epochs=50, batch_size=32, validation_data=(X_can_test, y_imp_can_test), verbose=1)
-models["importe_por_provincia"].fit(X_prov_train, y_imp_prov_train, epochs=50, batch_size=32, validation_data=(X_prov_test, y_imp_prov_test), verbose=1)
+models["unidades_por_categoria"].fit(X_cat_train, y_uni_train, epochs=10, batch_size=32, validation_data=(X_cat_test, y_uni_test), verbose=1)
+models["importe_por_canal"].fit(X_can_train, y_imp_can_train, epochs=10, batch_size=32, validation_data=(X_can_test, y_imp_can_test), verbose=1)
+models["importe_por_provincia"].fit(X_prov_train, y_imp_prov_train, epochs=10, batch_size=32, validation_data=(X_prov_test, y_imp_prov_test), verbose=1)
 
 # Evaluar modelos
 results = {
