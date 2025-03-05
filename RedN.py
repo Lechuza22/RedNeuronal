@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from tensorflow import keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
-from sklearn.model_selection import train_test_spl
+from sklearn.model_selection import train_test_split
 
 
 # Cargar los archivos
