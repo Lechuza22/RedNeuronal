@@ -1,8 +1,81 @@
 import streamlit as st
-import numpy as np
 import tensorflow as tf
-import pandas as pd
+from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.model_selection import train_test_split
+import pandas as pd
+
+# Cargar los archivos
+file_ventas = "ventas_Hoja1.csv"
+df_ventas = pd.read_csv(file_ventas)
+
+# Eliminar registros con valores nulos
+df_ventas_clean = df_ventas.dropna()
+
+# Codificar variables categóricas
+label_encoders = {}
+categorical_cols = ["categoria", "canal", "provincia"]
+
+for col in categorical_cols:
+    le = LabelEncoder()
+    df_ventas_clean[col] = le.fit_transform(df_ventas_clean[col])
+    label_encoders[col] = le
+
+# Normalizar las variables de salida
+scaler = StandardScaler()
+df_ventas_clean[["unidades", "importe"]] = scaler.fit_transform(df_ventas_clean[["unidades", "importe"]])
+
+# Separar datos para los 3 modelos
+X_categoria = df_ventas_clean[["categoria"]]
+y_unidades = df_ventas_clean["unidades"]
+
+X_canal = df_ventas_clean[["canal"]]
+y_importe_canal = df_ventas_clean["importe"]
+
+X_provincia = df_ventas_clean[["provincia"]]
+y_importe_provincia = df_ventas_clean["importe"]
+
+# Dividir en conjuntos de entrenamiento y prueba
+X_cat_train, X_cat_test, y_uni_train, y_uni_test = train_test_split(X_categoria, y_unidades, test_size=0.2, random_state=42)
+X_can_train, X_can_test, y_imp_can_train, y_imp_can_test = train_test_split(X_canal, y_importe_canal, test_size=0.2, random_state=42)
+X_prov_train, X_prov_test, y_imp_prov_train, y_imp_prov_test = train_test_split(X_provincia, y_importe_provincia, test_size=0.2, random_state=42)
+
+# Función para crear el modelo
+def build_model():
+    model = Sequential([
+        Dense(32, activation="relu", input_shape=(1,)),
+        Dense(64, activation="relu"),
+        Dropout(0.2),
+        Dense(32, activation="relu"),
+        Dense(1, activation="linear")  # Salida continua para regresión
+    ])
+    model.compile(optimizer="adam", loss="mse", metrics=["mae"])
+    return model
+
+# Construir y entrenar modelos
+models = {
+    "unidades_por_categoria": build_model(),
+    "importe_por_canal": build_model(),
+    "importe_por_provincia": build_model()
+}
+
+# Entrenar modelos
+models["unidades_por_categoria"].fit(X_cat_train, y_uni_train, epochs=50, batch_size=32, validation_data=(X_cat_test, y_uni_test), verbose=1)
+models["importe_por_canal"].fit(X_can_train, y_imp_can_train, epochs=50, batch_size=32, validation_data=(X_can_test, y_imp_can_test), verbose=1)
+models["importe_por_provincia"].fit(X_prov_train, y_imp_prov_train, epochs=50, batch_size=32, validation_data=(X_prov_test, y_imp_prov_test), verbose=1)
+
+# Evaluar modelos
+results = {
+    "unidades_por_categoria": models["unidades_por_categoria"].evaluate(X_cat_test, y_uni_test, verbose=0),
+    "importe_por_canal": models["importe_por_canal"].evaluate(X_can_test, y_imp_can_test, verbose=0),
+    "importe_por_provincia": models["importe_por_provincia"].evaluate(X_prov_test, y_imp_prov_test, verbose=0)
+}
+
+print("Resultados de evaluación:")
+print(results)
+
 
 # Cargar los modelos entrenados
 model_unidades = tf.keras.models.load_model("modelo_unidades.h5")
