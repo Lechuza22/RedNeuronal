@@ -64,11 +64,11 @@ for key, filename in models_filenames.items():
     except:
         models[key] = build_model()
         if key == "unidades_por_categoria":
-            models[key].fit(X_cat_train, y_uni_train, epochs=5, batch_size=16, validation_data=(X_cat_test, y_uni_test), verbose=0)
+            models[key].fit(X_cat_train, y_uni_train, epochs=5, batch_size=128, validation_data=(X_cat_test, y_uni_test), verbose=0)
         elif key == "importe_por_canal":
-            models[key].fit(X_can_train, y_imp_can_train, epochs=5, batch_size=16, validation_data=(X_can_test, y_imp_can_test), verbose=0)
+            models[key].fit(X_can_train, y_imp_can_train, epochs=5, batch_size=128, validation_data=(X_can_test, y_imp_can_test), verbose=0)
         elif key == "importe_por_provincia":
-            models[key].fit(X_prov_train, y_imp_prov_train, epochs=5, batch_size=16, validation_data=(X_prov_test, y_imp_prov_test), verbose=0)
+            models[key].fit(X_prov_train, y_imp_prov_train, epochs=5, batch_size=128, validation_data=(X_prov_test, y_imp_prov_test), verbose=0)
         models[key].save(filename)
 
 # Interfaz con Streamlit
